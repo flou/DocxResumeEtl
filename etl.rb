@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby -wKU
-
-require 'json'
-require 'mysql2'
+require 'profiler'
 
 class ETL
 
@@ -69,7 +67,9 @@ class ETL
   def reformat
     @cv.each do |item|
       value = item[1]
-      value = cleanup(value) if value != nil && value != ""
+      if value != nil && value != ""
+        value = cleanup(value)
+      end
     end
 
     %w{
@@ -91,12 +91,12 @@ class ETL
     historique = {}
     (0..@experiences - 1).each do |i|
       historique["experience_#{i}"] = {}
-      historique["experience_#{i}"]["entreprise"]     = @entreprises[i-1]
-      historique["experience_#{i}"]["periode"]        = @periodes[i-1]
-      historique["experience_#{i}"]["projet"]         = @projets[i-1]
-      historique["experience_#{i}"]["fonction"]       = @fonctions[i-1]
-      historique["experience_#{i}"]["responsabilite"] = @responsabilite[i-1]
-      historique["experience_#{i}"]["envtech"]        = @envtech[i-1]
+      historique["experience_#{i}"]["entreprise"]     = @entreprises[i]
+      historique["experience_#{i}"]["periode"]        = @periodes[i]
+      historique["experience_#{i}"]["projet"]         = @projets[i]
+      historique["experience_#{i}"]["fonction"]       = @fonctions[i]
+      historique["experience_#{i}"]["responsabilite"] = @responsabilite[i]
+      historique["experience_#{i}"]["envtech"]        = @envtech[i]
     end
     @cv["Historique de carrière"] = historique
     %w{
@@ -145,23 +145,8 @@ class ETL
     @cv
   end
 end
-
+Profiler__.start_profile
 cv = ETL.new ARGV[0]
-p cv # puts JSON.pretty_generate(cv.cv)
-
-# result = RubyProf.stop
-# Print a flat profile to text
-# printer = RubyProf::FlatPrinter.new(result)
-# printer.print
-
-# begin
-#   # client = Mysql2::Client.new(:host => "localhost", :username => "root")
-#   # puts Mysql2::Client.default_query_options
-# rescue Mysql2::Error => e
-#   puts "Error code: #{e.errno}"
-#   puts "Error message: #{e.error}"
-#   puts "Error SQLSTATE: #{e.sqlstate}" if e.respond_to?("sqlstate")
-# ensure
-#   # disconnect from server
-#   client.close if client
-# end
+p cv
+Profiler__.stop_profile
+Profiler__.print_profile($stdout)

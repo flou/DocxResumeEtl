@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby -wKU
-require 'profiler'
 
 class ETL
+  EXTRACT_SCRIPT = File.join(File.dirname(File.expand_path(__FILE__)) , 'extract.sh')
 
   def initialize(cv_file)
     @entreprises    = Array.new
@@ -13,7 +13,7 @@ class ETL
 
     @cv             = Hash.new
 
-    raw_cv = %x{./extract.sh #{cv_file}}.to_s
+    raw_cv = %x{#{EXTRACT_SCRIPT} #{cv_file}}
     @cv    = to_json(raw_cv)
   end
 
@@ -22,8 +22,10 @@ class ETL
     ary = []
 
     raw_cv.split(/\n/).each do |line|
-      line = line.split(/:/, 2)
-      ary.push line
+      if !line.empty?
+        line = line.split(/:/, 2)
+        ary.push line
+      end
     end
 
     cpt = 0
@@ -55,9 +57,11 @@ class ETL
   def to_json(raw_cv)
     to_array(raw_cv)
     raw_cv.split(/\n/).each do |line|
-      line = line.split(/:/, 2)
-  	  key = line[0]
-      @cv[key] = line[1]
+      if !line.empty?
+        line = line.split(/:/, 2)
+    	  key = line[0]
+        @cv[key] = line[1]
+      end
     end
     reformat
     return @cv
@@ -145,8 +149,6 @@ class ETL
     @cv
   end
 end
-Profiler__.start_profile
+
 cv = ETL.new ARGV[0]
 p cv
-Profiler__.stop_profile
-Profiler__.print_profile($stdout)

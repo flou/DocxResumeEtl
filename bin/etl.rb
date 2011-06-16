@@ -13,7 +13,7 @@ class ETL
 
     @cv             = Hash.new
 
-    raw_cv = %x{#{EXTRACT_SCRIPT} #{cv_file}}
+    raw_cv = %x{"#{EXTRACT_SCRIPT}" "#{cv_file}"}
     @cv    = to_json(raw_cv)
   end
 

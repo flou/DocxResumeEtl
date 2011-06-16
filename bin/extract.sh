@@ -4,7 +4,7 @@ if [ ! -f "$1" ]; then
 	exit 0;
 fi
 # Prenom Nom : Fonction
-unzip -p "$1" word/header1.xml | sed \
+unzip -p "$1" word/header\*.xml | sed \
 -e 's/<wp:posOffset>-[0-9]*<\/wp:posOffset>//g' \
 -e 's/\(<w:pStyle w:val="CVConsultantName"\/>\)/Nom:\1/g' \
 -e 's/\(<w:pStyle w:val="CVConsultantJob"\/>\)/\==newline==Titre:\1/g' \

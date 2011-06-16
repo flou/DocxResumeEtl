@@ -12,7 +12,7 @@
 		"async":">= 0.1.9",
 		"coloured-log":">= 0.9.6",
 		"underscore":">= 1.1.6",
-		"watch":">= 0.3.2"
+		"stalker":">= 0.0.6"
 	}, 
 	"repository": { 
 		"type" : "git",

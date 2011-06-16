@@ -146,9 +146,9 @@ class ETL
   end
   
   def to_s
-    @cv
+    p @cv
   end
 end
 
 cv = ETL.new ARGV[0]
-p cv
+cv.to_s

@@ -1,29 +1,21 @@
 #!/usr/bin/env ruby -wKU
 
-require "text"
 require "ap"
 
 MONTHS = {
-  "janvier"   => "01",
-  "fevrier"   => "02", 
-  "mars"      => "03",
-  "avril"     => "04",
-  "mai"       => "05",
-  "juin"      => "06",
-  "juillet"   => "07",
-  "aout"      => "08",
-  "septembre" => "09",
-  "octobre"   => "10",
-  "novembre"  => "11",
-  "decembre"  => "12"
+  /janvier/i   => "01",
+  /f.vrier/i   => "02", 
+  /mars/i      => "03",
+  /avril/i     => "04",
+  /mai/i       => "05",
+  /juin/i      => "06",
+  /juillet/i   => "07",
+  /ao.t/i      => "08",
+  /septembre/i => "09",
+  /octobre/i   => "10",
+  /novembre/i  => "11",
+  /d.cembre/i  => "12"
 }
-
-String.module_eval do
-  def similar?(other, threshold=2)
-    distance = Text::Levenshtein.distance(self, other)
-    distance <= threshold
-  end
-end
 
 
 class ETL
@@ -143,7 +135,7 @@ class ETL
   # Formatte une chaine sous la forme MM/AAAA
   def to_date(str)
     MONTHS.each do |month|
-      if month[0].similar? str.match(/\p{Letter}*/).to_s.downcase
+      if str.match(/\p{Letter}*/).to_s.downcase.match(month[0])
         str.sub!(/\p{Letter}*/, month[1])
         str.sub!(/\s/, '/')
       end

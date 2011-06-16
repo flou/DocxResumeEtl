@@ -134,11 +134,15 @@ class ETL
   ##
   # Formatte une chaine sous la forme MM/AAAA
   def to_date(str)
+    origin_str = str
     MONTHS.each do |month|
       if str.match(/\p{Letter}*/).to_s.downcase.match(month[0])
         str.sub!(/\p{Letter}*/, month[1])
-        str.sub!(/\s/, '/')
+        str.sub!(/\s/, "/")
       end
+    end
+    if str == origin_str
+      str.sub!(/\p{L}*\s/, "")
     end
     return str
   end

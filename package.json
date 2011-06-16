@@ -1,0 +1,28 @@
+{ 
+	"name": "DocxResumeEtl",
+	"version": "0.0.1",
+	"description": "Docx Resume ETL Daemon",
+	"contributors":[ 
+		{ "name": "Lou Ferrand"},
+		{ "name": "Maria Rabarison"},
+		{ "name": "Michaël Schwartz", "email": "m.schwartz@epokmedia.fr" }
+	],
+	"engines": { "node": ">= 0.4.8" },
+	"dependencies" : {
+		"async":">= 0.1.9",
+		"coloured-log":">= 0.9.6",
+		"underscore":">= 1.1.6",
+		"watch":">= 0.3.2"
+	}, 
+	"repository": { 
+		"type" : "git",
+		"url" : "https://github.com/flou/DocxResumeEtl.git"
+  	},
+	"bugs":"https://github.com/flou/DocxResumeEtl/issues",
+	"licences":[
+		{
+       		"type": "GPLv3",
+       		"url": "http://www.gnu.org/licenses/gpl.html"
+		}
+	]
+}

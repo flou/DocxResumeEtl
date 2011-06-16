@@ -1,10 +1,10 @@
 #!/bin/bash
-if [ ! -f $1 ]; then
+if [ ! -f "$1" ]; then
 	echo "Error: File does not exist"
 	exit 0;
 fi
 # Prenom Nom : Fonction
-unzip -p $1 word/header1.xml | sed \
+unzip -p "$1" word/header1.xml | sed \
 -e 's/<wp:posOffset>-[0-9]*<\/wp:posOffset>//g' \
 -e 's/\(<w:pStyle w:val="CVConsultantName"\/>\)/Nom:\1/g' \
 -e 's/\(<w:pStyle w:val="CVConsultantJob"\/>\)/\==newline==Titre:\1/g' \
@@ -13,7 +13,7 @@ unzip -p $1 word/header1.xml | sed \
 /g' \
 -e '1d'
 # Contenu du CV
-unzip -p $1 word/document.xml | \
+unzip -p "$1" word/document.xml | \
 sed \
 -e 's/\(<w:pStyle w:val="CVBullet1"\/>\)/| \1/g' \
 -e 's/\(<w:pStyle w:val="CVTabBullet1"\/>\)/| \1/g' \

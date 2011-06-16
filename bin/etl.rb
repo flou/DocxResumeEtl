@@ -1,6 +1,30 @@
 #!/usr/bin/env ruby -wKU
 
+require "text"
 require "ap"
+
+MONTHS = {
+  "janvier"   => "01",
+  "fevrier"   => "02", 
+  "mars"      => "03",
+  "avril"     => "04",
+  "mai"       => "05",
+  "juin"      => "06",
+  "juillet"   => "07",
+  "aout"      => "08",
+  "septembre" => "09",
+  "octobre"   => "10",
+  "novembre"  => "11",
+  "decembre"  => "12"
+}
+
+String.module_eval do
+  def similar?(other, threshold=2)
+    distance = Text::Levenshtein.distance(self, other)
+    distance <= threshold
+  end
+end
+
 
 class ETL
   EXTRACT_SCRIPT = File.join(File.dirname(File.expand_path(__FILE__)) , 'extract.sh')
@@ -41,13 +65,13 @@ class ETL
           @entreprises.push value.strip
         end
         cpt += 1
-      when "Projet"
+      when "projet"
         @projets.push value.strip
-      when "Fonction"
+      when "fonction"
         @fonctions.push value.strip
-      when "Environnement technique"
+      when "environnement_technique"
         @envtech.push value.strip
-      when "Responsabilité"
+      when "responsabilite"
         responsabilite = cleanup(value)
         @responsabilites.push responsabilite.strip
       end
@@ -61,7 +85,7 @@ class ETL
     raw_cv.split(/\n/).each do |line|
       if !line.empty?
         line = line.split(/:/, 2)
-    	  key = line[0]
+    	  key = line[0].sub(/\p{Z}$/, "")
         @cv[key] = line[1]
       end
     end
@@ -84,36 +108,64 @@ class ETL
     end
 
     format_career_history
-    format_langues
-    format_diplome
-    format_nom
-    format_formations if @cv["formations"] != nil
+    format_nom        unless @cv["nom"] == nil
+    format_langues    unless @cv["langues"] == nil
+    format_diplomes   unless @cv["diplomes"] == nil
+    format_formations unless @cv["formations"] == nil
     remove_synthese
   end
   
+
   def remove_synthese
-    # p @cv.has_key? "synthese "
-    if @cv.has_key? "synthese "
-      @cv.delete "synthese "
+    if @cv.has_key? "synthese"
+      @cv.delete "synthese"
     end
   end
 
+
   def format_nom
-    nom = @cv["nom"]
-    
+    fullname = @cv["nom"].split(/\s/)
+    firstname, lastname = [], []
+    fullname.each do |part|
+      if part.upcase == part
+        lastname.push part
+      else
+        firstname.push part
+      end
+    end
+    @cv["lastname"]  = lastname.join(' ')
+    @cv["firstname"] = firstname.join(' ')
+    @cv.delete "nom"
   end
+
   
+  ##
+  # Formatte une chaine sous la forme MM/AAAA
+  def to_date(str)
+    MONTHS.each do |month|
+      if month[0].similar? str.match(/\p{Letter}*/).to_s.downcase
+        str.sub!(/\p{Letter}*/, month[1])
+        str.sub!(/\s/, '/')
+      end
+    end
+    return str
+  end
+
+  
+  ##
+  # Formatte toute la catégorie Historique de carriere du CV
   def format_career_history
     historique = []
     (0..@experiences - 1).each do |i|
       experience = {}
 
       periode = @periodes[i].scan(/\p{Letter}*\s\d{4,}/)
+            
       if periode.size == 2 # 2 dates: debut-fin
-        debut = periode[0]
-        fin   = periode[1]
+        debut = to_date(periode[0])
+        fin   = to_date(periode[1])
       elsif periode.size == 1 # une seule date
-        debut = periode[0]
+        debut = to_date(periode[0])
       end
 
       experience["entreprise"]         = @entreprises[i]
@@ -129,13 +181,14 @@ class ETL
     @cv["historique_carriere"] = historique
     %w{
       Historique
-      Projet
-      Fonction
-      Responsabilité
-      Environnement\ technique}.each do |cat|
+      projet
+      fonction
+      responsabilite
+      environnement_technique}.each do |cat|
       @cv.delete cat
     end
   end
+
 
   def cleanup(text)
     text.gsub!("&amp;", "&")
@@ -145,22 +198,23 @@ class ETL
     return text
   end
 
+
   def format_formations
-    form = @cv["formations"]
-    form = cleanup(form)
+    form = cleanup @cv["formations"]
     ary = []
     form.split(/\|/).each { |element| ary.push element }
     @cv["formations"] = ary
   end
 
-  def format_diplome
+
+  def format_diplomes
     form = cleanup @cv["diplomes"]
     ary = []
     form.split(/\|/).each do |element| 
       diplome = {}
       md = element.match(/^(.*)\s*\((\d{4,})\)\s*:\s*(.*)$/)
       if md != nil
-        diplome["institut"] = md[1]
+        diplome["institut"] = md[1].strip
         diplome["annee"]    = md[2]
         diplome["diplome"]  = md[3]
       else
@@ -170,6 +224,7 @@ class ETL
     end
     @cv["diplomes"] = ary
   end
+
 
   def format_langues
     ary = []
@@ -183,12 +238,14 @@ class ETL
     @cv["langues"] = ary
   end
 
+
   def format_category(cv_category)
-    content = cleanup(@cv[cv_category])
+    content = cleanup @cv[cv_category]
     ary = []
     content.split(/\|/).each { |element| ary.push element }
     @cv[cv_category] = ary
   end
+  
   
   def to_s
     ap @cv

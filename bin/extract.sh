@@ -22,10 +22,10 @@ sed \
 -e 's/\(<w:pStyle w:val="CVKeypointHdr"\/>\)/==newline==/g' \
 -e 's/\(<w:pStyle w:val="CVTabHdr"\/>\)/==newline==/g' \
 -e 's/\(<w:pStyle w:val="CVExperienceHeader"\/>\)/\1==newline==Historique:/g' \
--e 's/<w:t>\(Projet\)<\/w:t>/==newline==\1:/g' \
--e 's/<w:t>\(Fonction\)<\/w:t>/==newline==\1:/g' \
--e 's/<w:t>\(Responsabilité\)<\/w:t>/==newline==\1:/g' \
--e 's/<w:t>\(Environnement\ technique\)<\/w:t>/==newline==\1:/g' \
+-e 's/<w:t>\(Projet\)<\/w:t>/==newline==projet:/g' \
+-e 's/<w:t>\(Fonction\)<\/w:t>/==newline==fonction:/g' \
+-e 's/<w:t>\(Responsabilité\)<\/w:t>/==newline==responsabilite:/g' \
+-e 's/<w:t>\(Environnement\ technique\)<\/w:t>/==newline==environnement_technique:/g' \
 -e 's/>/>\
 /g' \
 -e 's/<[^>]\{1,\}>//g; s/[^[:print:]]\{1,\}//g' \
@@ -37,7 +37,7 @@ sed \
 -e 's/\(Domaines\ de\ compétences\)\(.*\)/==newline==domaines_de_competences:\2/g' \
 -e 's/\(Langues\)\(.*\)/==newline==langues:\2/g' \
 -e 's/\(Diplômes\ et\ certifications\)\(.*\)/==newline==diplomes:\2/g' \
--e 's/\(Synthèse\ de\ carrière\)\(.*\)/==newline==synthese\2/g' \
+-e 's/\(Synthèse\ de\ carrière\)\(.*\)/synthese\2/g' \
 -e 's/\(==newline==\)/\
 /g' \
 -e '1d'

@@ -1,17 +1,19 @@
 #!/usr/bin/env ruby -wKU
 
+require "ap"
+
 class ETL
   EXTRACT_SCRIPT = File.join(File.dirname(File.expand_path(__FILE__)) , 'extract.sh')
 
   def initialize(cv_file)
-    @entreprises    = Array.new
-    @periodes       = Array.new
-    @responsabilite = Array.new
-    @fonctions      = Array.new
-    @projets        = Array.new
-    @envtech        = Array.new
+    @entreprises     = Array.new
+    @periodes        = Array.new
+    @responsabilites = Array.new
+    @fonctions       = Array.new
+    @projets         = Array.new
+    @envtech         = Array.new
 
-    @cv             = Hash.new
+    @cv              = Hash.new
 
     raw_cv = %x{"#{EXTRACT_SCRIPT}" "#{cv_file}"}
     @cv    = to_json(raw_cv)
@@ -47,7 +49,7 @@ class ETL
         @envtech.push value.strip
       when "Responsabilité"
         responsabilite = cleanup(value)
-        @responsabilite.push responsabilite.strip
+        @responsabilites.push responsabilite.strip
       end
     end
     @experiences = cpt / 2
@@ -76,33 +78,55 @@ class ETL
       end
     end
 
-    %w{
-      Expérience\ sectorielle
-      Compétences\ fonctionnelles
-      Diplômes\ et\ certifications
-      Compétences\ techniques
-      Domaines\ de\ compétences}.each do |category|
+    %w{experience_sectorielle competences_fonctionnelles
+       competences_techniques domaines_de_competences}.each do |category|
       format_category(category)
     end
 
     format_career_history
     format_langues
-    format_formations if @cv["Formations"] != nil
+    format_diplome
+    format_nom
+    format_formations if @cv["formations"] != nil
+    remove_synthese
+  end
+  
+  def remove_synthese
+    # p @cv.has_key? "synthese "
+    if @cv.has_key? "synthese "
+      @cv.delete "synthese "
+    end
   end
 
-
+  def format_nom
+    nom = @cv["nom"]
+    
+  end
+  
   def format_career_history
-    historique = {}
+    historique = []
     (0..@experiences - 1).each do |i|
-      historique["experience_#{i}"] = {}
-      historique["experience_#{i}"]["entreprise"]     = @entreprises[i]
-      historique["experience_#{i}"]["periode"]        = @periodes[i]
-      historique["experience_#{i}"]["projet"]         = @projets[i]
-      historique["experience_#{i}"]["fonction"]       = @fonctions[i]
-      historique["experience_#{i}"]["responsabilite"] = @responsabilite[i]
-      historique["experience_#{i}"]["envtech"]        = @envtech[i]
+      experience = {}
+
+      periode = @periodes[i].scan(/\p{Letter}*\s\d{4,}/)
+      if periode.size == 2 # 2 dates: debut-fin
+        debut = periode[0]
+        fin   = periode[1]
+      elsif periode.size == 1 # une seule date
+        debut = periode[0]
+      end
+
+      experience["entreprise"]         = @entreprises[i]
+      experience["periode"]            = {}
+      experience["periode"]["debut"]   = debut
+      experience["periode"]["fin"]     = fin if fin
+      experience["projet"]             = @projets[i]
+      experience["fonction"]           = @fonctions[i]
+      experience["responsabilite"]     = @responsabilites[i]
+      experience["environnement_tech"] = @envtech[i]
+      historique.push experience
     end
-    @cv["Historique de carrière"] = historique
+    @cv["historique_carriere"] = historique
     %w{
       Historique
       Projet
@@ -122,20 +146,41 @@ class ETL
   end
 
   def format_formations
-    form = @cv["Formations"]
+    form = @cv["formations"]
     form = cleanup(form)
     ary = []
     form.split(/\|/).each { |element| ary.push element }
-    @cv["Formations"] = ary
+    @cv["formations"] = ary
+  end
+
+  def format_diplome
+    form = cleanup @cv["diplomes"]
+    ary = []
+    form.split(/\|/).each do |element| 
+      diplome = {}
+      md = element.match(/^(.*)\s*\((\d{4,})\)\s*:\s*(.*)$/)
+      if md != nil
+        diplome["institut"] = md[1]
+        diplome["annee"]    = md[2]
+        diplome["diplome"]  = md[3]
+      else
+        diplome["institut"] = element
+      end
+      ary.push diplome
+    end
+    @cv["diplomes"] = ary
   end
 
   def format_langues
-    langues = {}
-    @cv["Langues"].split(/\|/).each do |lang|
+    ary = []
+    @cv["langues"].split(/\|/).each do |lang|
       lang = lang.split(/:/)
-      langues[lang[0]] = lang[1]
+      langue = {}
+      langue["langue"] = lang[0].strip
+      langue["niveau"] = lang[1].strip
+      ary.push langue
     end
-    @cv["Langues"] = langues
+    @cv["langues"] = ary
   end
 
   def format_category(cv_category)
@@ -146,7 +191,7 @@ class ETL
   end
   
   def to_s
-    p @cv
+    ap @cv
   end
 end
 

@@ -6,8 +6,8 @@ fi
 # Prenom Nom : Fonction
 unzip -p "$1" word/header\*.xml | sed \
 -e 's/<wp:posOffset>-[0-9]*<\/wp:posOffset>//g' \
--e 's/\(<w:pStyle w:val="CVConsultantName"\/>\)/Nom:\1/g' \
--e 's/\(<w:pStyle w:val="CVConsultantJob"\/>\)/\==newline==Titre:\1/g' \
+-e 's/\(<w:pStyle w:val="CVConsultantName"\/>\)/nom:\1/g' \
+-e 's/\(<w:pStyle w:val="CVConsultantJob"\/>\)/\==newline==titre:\1/g' \
 -e 's/<[^>]\{1,\}>//g; s/[^[:print:]]\{1,\}//g' \
 -e 's/\(==newline==\)/\
 /g' \
@@ -29,16 +29,15 @@ sed \
 -e 's/>/>\
 /g' \
 -e 's/<[^>]\{1,\}>//g; s/[^[:print:]]\{1,\}//g' \
--e 's/\(Historique\ de\ carrière\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Formations\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Compétences\ techniques\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Compétences\ fonctionnelles\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Expérience\ sectorielle\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Domaines\ de\ compétences\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Langues\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Diplômes\ et\ certifications\)\(.*\)/==newline==\1:\2/g' \
--e 's/\(Synthèse\ de\ carrière\)\(.*\)/==newline==\1\2/g' \
+-e 's/\(Historique\ de\ carrière\)\(.*\)/==newline==historique_carriere:\2/g' \
+-e 's/\(Formations\)\(.*\)/==newline==formations:\2/g' \
+-e 's/\(Compétences\ techniques\)\(.*\)/==newline==competences_techniques:\2/g' \
+-e 's/\(Compétences\ fonctionnelles\)\(.*\)/==newline==competences_fonctionnelles:\2/g' \
+-e 's/\(Expérience\ sectorielle\)\(.*\)/==newline==experience_sectorielle:\2/g' \
+-e 's/\(Domaines\ de\ compétences\)\(.*\)/==newline==domaines_de_competences:\2/g' \
+-e 's/\(Langues\)\(.*\)/==newline==langues:\2/g' \
+-e 's/\(Diplômes\ et\ certifications\)\(.*\)/==newline==diplomes:\2/g' \
+-e 's/\(Synthèse\ de\ carrière\)\(.*\)/==newline==synthese\2/g' \
 -e 's/\(==newline==\)/\
 /g' \
 -e '1d'
-# echo "Experiences: " grep "Historique:" | wc -w

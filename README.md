@@ -1,4 +1,4 @@
-This is a home made ETL with bash and Ruby.
+This is a home made ETL with Bash, Ruby and Node.js
 
 ## Installation
 * Checkout the whole project

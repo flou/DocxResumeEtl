@@ -8,7 +8,14 @@ var defaultConfig = {
 	logLevel:Log.DEBUG,
 	queueDirectory: __dirname + '/tests/queue',
 	concurrency:1,
-	extractTransformBinary: __dirname + '/bin/etl.rb'
+	extractTransformBinary: __dirname + '/bin/etl.rb',
+	mysql:{
+		host:'localhost',
+		port:3306,
+		db:'bi',
+		user:'bi',
+		password:''
+	}
 }
 
 configs.development = defaultConfig;

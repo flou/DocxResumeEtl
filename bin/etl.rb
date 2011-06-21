@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby -wKU
 
-require "ap"
-
 MONTHS = {
   /janvier/i   => "01",
   /f.vrier/i   => "02", 
@@ -244,7 +242,7 @@ class ETL
   
   
   def to_s
-    ap @cv
+    p @cv
   end
 end
 

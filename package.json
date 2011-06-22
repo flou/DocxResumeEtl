@@ -9,6 +9,7 @@
 	],
 	"engines": { "node": ">= 0.4.8" },
 	"dependencies" : {
+		"csv":">= 0.0.9",
 		"mysql":">= 0.9.1",
 		"async":">= 0.1.9",
 		"coloured-log":">= 0.9.6",

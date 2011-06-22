@@ -12,15 +12,24 @@ var defaultConfig = {
 	mysql:{
 		host:'localhost',
 		port:3306,
-		db:'bi',
-		user:'bi',
-		password:''
+		database:'DocxResumeEtl',
+		user:'root',
+		password:'',
+		debug:false
 	}
 }
 
 configs.development = defaultConfig;
 configs.production = _.extend({}, defaultConfig, {
 	logLevel:Log.INFO,
+	mysql:{
+		host:'localhost',
+		port:3306,
+		user:'root',
+		password:'',
+		database:'DocxResumeEtl',
+		debug:false
+	}
 });
 
 module.exports = configs[applicationEnv];

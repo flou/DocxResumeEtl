@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby -wKU
 
+require "ap"
+
 MONTHS = {
   /janvier/i   => "01",
-  /f.vrier/i   => "02", 
+  /f.vrier/i   => "02",
   /mars/i      => "03",
   /avril/i     => "04",
   /mai/i       => "05",
@@ -75,7 +77,7 @@ class ETL
     raw_cv.split(/\n/).each do |line|
       if !line.empty?
         line = line.split(/:/, 2)
-    	  key = line[0].sub(/\p{Z}$/, "")
+        key = line[0].sub(/\p{Z}$/, "")
         @cv[key] = line[1]
       end
     end
@@ -103,8 +105,9 @@ class ETL
     format_diplomes   unless @cv["diplomes"] == nil
     format_formations unless @cv["formations"] == nil
     remove_synthese
+    format_competences_techniques
   end
-  
+
 
   def remove_synthese
     if @cv.has_key? "synthese"
@@ -128,7 +131,7 @@ class ETL
     @cv.delete "nom"
   end
 
-  
+
   ##
   # Formatte une chaine sous la forme MM/AAAA
   def to_date(str)
@@ -145,7 +148,7 @@ class ETL
     return str
   end
 
-  
+
   ##
   # Formatte toute la catégorie Historique de carriere du CV
   def format_career_history
@@ -154,7 +157,7 @@ class ETL
       experience = {}
 
       periode = @periodes[i].scan(/\p{Letter}*\s\d{4,}/)
-            
+
       if periode.size == 2 # 2 dates: debut-fin
         debut = to_date(periode[0])
         fin   = to_date(periode[1])
@@ -204,7 +207,7 @@ class ETL
   def format_diplomes
     form = cleanup @cv["diplomes"]
     ary = []
-    form.split(/\|/).each do |element| 
+    form.split(/\|/).each do |element|
       diplome = {}
       md = element.match(/^(.*)\s*\((\d{4,})\)\s*:\s*(.*)$/)
       if md != nil
@@ -239,8 +242,29 @@ class ETL
     content.split(/\|/).each { |element| ary.push element }
     @cv[cv_category] = ary
   end
-  
-  
+
+  def format_competences_techniques
+    comp = @cv["competences_techniques"]
+    competences = []
+    comp.each do |str|
+      if str.include?(":")
+        competences.push str.split(/:/)[1]
+      else
+        competences.push str
+      end
+    end
+    comp = []
+    competences.each do |item|
+      comp.push item.split(/,/)
+    end
+    comp.flatten!
+    comp.each do |item|
+      item.gsub!(/[()]/, "")
+      item.strip!
+    end
+    @cv["competences_techniques"] = comp
+  end
+
   def to_s
     p @cv
   end

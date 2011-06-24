@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -wKU
 
-require "ap"
+require "json"
 
 MONTHS = {
   /janvier/i   => "01",
@@ -266,7 +266,7 @@ class ETL
   end
 
   def to_s
-    p @cv
+    p JSON.generate @cv
   end
 end
 

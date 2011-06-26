@@ -26,8 +26,8 @@ csv()
  if (data[2] < 15) return;
     log.info('Inserting #'+index+' '+JSON.stringify(data));
  client.query(
-   'INSERT INTO technologie SET id_technologie = ?, tagname = ?, count = ?',
-   [index, data[1], data[2]],
+   'INSERT INTO technologie SET tagname = ?, count = ?',
+   [data[1], data[2]],
    function(err) {
      if (err) log.warning(err);
      log.info('Inserted #'+index+' '+JSON.stringify(data));

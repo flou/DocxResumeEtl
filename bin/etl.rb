@@ -106,6 +106,7 @@ class ETL
     format_formations unless @cv["formations"] == nil
     remove_synthese
     format_competences_techniques
+    format_environnement_tech
   end
 
 
@@ -133,7 +134,7 @@ class ETL
 
 
   ##
-  # Formatte une chaine sous la forme MM/AAAA
+  # Formatte une chaine sous la forme AAAA/MM/JJ où JJ est toujours 01
   def to_date(str)
     origin_str = str
     MONTHS.each do |month|
@@ -145,7 +146,9 @@ class ETL
     if str == origin_str
       str.sub!(/\p{L}*\s/, "")
     end
-    return str
+    parts = str.partition(/\//)
+    date = parts[2] + "/" + parts[0] + "/" + "01"
+    return date
   end
 
 
@@ -157,14 +160,13 @@ class ETL
       experience = {}
 
       periode = @periodes[i].scan(/\p{Letter}*\s\d{4,}/)
-
       if periode.size == 2 # 2 dates: debut-fin
         debut = to_date(periode[0])
         fin   = to_date(periode[1])
       elsif periode.size == 1 # une seule date
         debut = to_date(periode[0])
       end
-
+      
       experience["entreprise"]         = @entreprises[i]
       experience["periode"]            = {}
       experience["periode"]["debut"]   = debut
@@ -243,6 +245,7 @@ class ETL
     @cv[cv_category] = ary
   end
 
+
   def format_competences_techniques
     comp = @cv["competences_techniques"]
     competences = []
@@ -263,6 +266,20 @@ class ETL
       item.strip!
     end
     @cv["competences_techniques"] = comp
+  end
+
+  ##
+  # Formatte les rubriques "environnement technique" pour supprimer les espaces
+  def format_environnement_tech
+    (0..@experiences - 1).each do |i|
+      technos_array = []
+      technos = @cv["historique_carriere"][i]["environnement_tech"]
+      technos.split(/\p{Z}*,\p{Z}*/).each do |techno|
+        technos_array.push techno
+      end
+      @cv["historique_carriere"][i]["environnement_tech"] = technos_array
+      p technos_array
+    end
   end
 
   def to_s

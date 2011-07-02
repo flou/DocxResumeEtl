@@ -283,7 +283,7 @@ class ETL
   end
 
   def to_s
-    p JSON.generate @cv
+    print JSON.generate @cv
   end
 end
 

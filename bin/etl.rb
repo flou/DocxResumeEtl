@@ -278,7 +278,6 @@ class ETL
         technos_array.push techno
       end
       @cv["historique_carriere"][i]["environnement_tech"] = technos_array
-      p technos_array
     end
   end
 

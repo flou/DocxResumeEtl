@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby -wKU
-
+#!/usr/bin/env ruby
+# encoding: UTF-8
 require "json"
 
 MONTHS = {
@@ -77,7 +77,7 @@ class ETL
     raw_cv.split(/\n/).each do |line|
       if !line.empty?
         line = line.split(/:/, 2)
-        key = line[0].sub(/\p{Z}$/, "")
+        key = line[0].sub(/\p{Space}$/, "")
         @cv[key] = line[1]
       end
     end
@@ -138,13 +138,13 @@ class ETL
   def to_date(str)
     origin_str = str
     MONTHS.each do |month|
-      if str.match(/\p{Letter}*/).to_s.downcase.match(month[0])
-        str.sub!(/\p{Letter}*/, month[1])
+      if str.match(/\p{Alpha}*/).to_s.downcase.match(month[0])
+        str.sub!(/\p{Alpha}*/, month[1])
         str.sub!(/\s/, "/")
       end
     end
     if str == origin_str
-      str.sub!(/\p{L}*\s/, "")
+      str.sub!(/\p{Alpha}*\s/, "")
     end
     parts = str.partition(/\//)
     date = parts[2] + "/" + parts[0] + "/" + "01"
@@ -159,7 +159,7 @@ class ETL
     (0..@experiences - 1).each do |i|
       experience = {}
 
-      periode = @periodes[i].scan(/\p{Letter}*\s\d{4,}/)
+      periode = @periodes[i].scan(/\p{Alpha}*\s\d{4,}/)
       if periode.size == 2 # 2 dates: debut-fin
         debut = to_date(periode[0])
         fin   = to_date(periode[1])
@@ -274,7 +274,7 @@ class ETL
     (0..@experiences - 1).each do |i|
       technos_array = []
       technos = @cv["historique_carriere"][i]["environnement_tech"]
-      technos.split(/\p{Z}*,\p{Z}*/).each do |techno|
+      technos.split(/\p{Space}*,\p{Space}*/).each do |techno|
         technos_array.push techno
       end
       @cv["historique_carriere"][i]["environnement_tech"] = technos_array

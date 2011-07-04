@@ -119,7 +119,7 @@ class ETL
 
 
   def format_nom
-    fullname = @cv["nom"].split(/\s/)
+    fullname = @cv["nom"].split(/\p{Space}/)
     firstname, lastname = [], []
     fullname.each do |part|
       if part.upcase == part
@@ -141,11 +141,11 @@ class ETL
     MONTHS.each do |month|
       if str.match(/\p{Alpha}*/).to_s.downcase.match(month[0])
         str.sub!(/\p{Alpha}*/, month[1])
-        str.sub!(/\s/, "/")
+        str.sub!(/\p{Space}/, "/")
       end
     end
     if str == origin_str
-      str.sub!(/\p{Alpha}*\s/, "")
+      str.sub!(/\p{Alpha}*\p{Space}/, "")
     end
     parts = str.partition(/\//)
     date = parts[2] + "/" + parts[0] + "/" + "01"
@@ -160,7 +160,7 @@ class ETL
     (0..@experiences - 1).each do |i|
       experience = {}
 
-      periode = @periodes[i].scan(/\p{Alpha}*\s\d{4,}/)
+      periode = @periodes[i].scan(/\p{Alpha}*\p{Space}\d{4,}/)
       if periode.size == 2 # 2 dates: debut-fin
         debut = to_date(periode[0])
         fin   = to_date(periode[1])
@@ -192,9 +192,9 @@ class ETL
 
   def cleanup(text)
     text.gsub!("&amp;", "&")
-    text.gsub!(/\s*\|\s*/, "|")
-    text.gsub!(/^\s*\|\s*/, "") # clean up at beginning of line
-    text.gsub!(/\s*\|\s*$/, "") # clean up at end of line
+    text.gsub!(/\p{Space}*\|\p{Space}*/, "|")
+    text.gsub!(/^\s*\|\p{Space}*/, "") # clean up at beginning of line
+    text.gsub!(/\p{Space}*\|\p{Space}*$/, "") # clean up at end of line
     return text
   end
 
@@ -212,7 +212,7 @@ class ETL
     ary = []
     form.split(/\|/).each do |element|
       diplome = {}
-      md = element.match(/^(.*)\s*\((\d{4,})\)\s*:?\s*(.*)$/)
+      md = element.match(/^(.*)\p{Space}*\((\d{4,})\)\p{Space}*:?\p{Space}*(.*)$/)
       if md != nil
         diplome["institut"] = md[1].strip
         diplome["annee"]    = md[2]

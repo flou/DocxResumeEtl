@@ -49,6 +49,7 @@ class ETL
     cpt = 0
     ary.each do |item|
       value = item[1]
+
       case item[0]
       when "Historique"
         if cpt % 2 == 1
@@ -65,7 +66,7 @@ class ETL
         @envtech.push value.strip
       when "responsabilite"
         responsabilite = cleanup(value)
-        @responsabilites.push responsabilite.strip
+        @responsabilites.push responsabilite.split(/\|/)
       end
     end
     @experiences = cpt / 2
@@ -211,7 +212,7 @@ class ETL
     ary = []
     form.split(/\|/).each do |element|
       diplome = {}
-      md = element.match(/^(.*)\s*\((\d{4,})\)\s*:\s*(.*)$/)
+      md = element.match(/^(.*)\s*\((\d{4,})\)\s*:?\s*(.*)$/)
       if md != nil
         diplome["institut"] = md[1].strip
         diplome["annee"]    = md[2]
